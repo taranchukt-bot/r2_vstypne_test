@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="uk"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Python Quest: Місія «Кристали коду»</title>
+<style>
+:root{--bg:#0f1226;--card:#1a1f3d;--tx:#eef0ff;--mut:#9aa3d6;--ac:#7c5cff;--ok:#2ecc8f;--bad:#ff5c7a;--gold:#ffc84a;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:light){:root:not([data-theme="dark"]){--bg:#eef0ff;--card:#fff;--tx:#1b1f3b;--mut:#5a628f}}
+*{box-sizing:border-box}html,body{margin:0}
+body{background:var(--bg);color:var(--tx);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;min-height:100vh}
+.w{max-width:640px;margin:0 auto;padding:14px}
+.top{display:flex;gap:8px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+.chip{background:var(--card);border-radius:999px;padding:6px 12px;font-weight:600;font-size:14px}
+button{font:inherit;cursor:pointer;border:0;border-radius:12px;color:var(--tx)}
+.res{background:var(--ac);color:#fff;padding:8px 14px;font-weight:700}
+.bar{height:10px;background:var(--card);border-radius:9px;margin:12px 0;overflow:hidden}
+.bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--ac),var(--gold));transition:width .4s}
+.card{background:var(--card);border-radius:18px;padding:18px;margin-top:8px}
+h1{font-size:24px;margin:4px 0}h2{font-size:19px;margin:0 0 12px;line-height:1.35}
+pre{background:#0a0c1c;color:#9ef0c0;padding:12px;border-radius:10px;overflow-x:auto;font-size:15px;margin:0 0 12px}
+.o{display:block;width:100%;text-align:left;background:transparent;border:2px solid var(--mut);padding:12px 14px;margin:8px 0;font-size:16px;font-family:ui-monospace,Menlo,Consolas,monospace}
+.o:hover:not(:disabled){border-color:var(--ac)}.o.ok{border-color:var(--ok);background:#2ecc8f33}.o.bad{border-color:var(--bad);background:#ff5c7a33}.o.off{opacity:.3}
+.fact{margin-top:12px;padding:12px;border-radius:12px;background:#ffc84a22;border-left:4px solid var(--gold);font-size:15px;line-height:1.45}
+.row{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
+.nx{background:var(--ac);color:#fff;padding:12px 20px;font-weight:700}.hint{background:var(--card);border:2px solid var(--gold);padding:10px 14px}
+.hint:disabled{opacity:.4}
+.big{font-size:56px;text-align:center}.ctr{text-align:center}
+.rv{font-size:14px;padding:8px 0;border-bottom:1px solid #8884}
+.hide{display:none}
+.in{width:100%;padding:10px 12px;border-radius:10px;border:2px solid var(--mut);background:transparent;color:var(--tx);font:inherit;margin:8px 0}
+.tp{position:fixed;inset:0;background:var(--bg);overflow-y:auto;z-index:20;padding-top:env(safe-area-inset-top,0px)}
+.tt{width:100%;border-collapse:collapse;font-size:14px}.tt td,.tt th{padding:8px 6px;border-bottom:1px solid #8884;text-align:left}
+details{font-size:14px;margin:4px 0}summary{cursor:pointer;font-weight:600}
+</style></head><body><div class="w">
+<div class="top"><span class="chip">💎 <b id="xp">0</b> XP</span><span class="chip">🔥 серія <b id="st">0</b></span><span><button class="res" onclick="showRes()">📊 Мій результат</button> <button id="tb" class="res hide" style="background:var(--card);border:2px solid var(--ac)" onclick="teacher()">👩‍🏫 Для вчителя</button></span></div>
+<div class="bar"><i id="pb"></i></div>
+<div id="app"></div></div><div id="tp" class="tp hide"></div>
+<script>
+const Q=[
+{q:"У програмі створено змінну age = 16. До якого типу належить змінна age?",o:["bool","str","list","int"],a:3,f:"Тип int (integer) у Python не має обмеження розміру: можна обчислити навіть 2**1000!"},
+{q:"Що буде результатом виконання коду?",c:'name = "Олег"\nprint(name)',o:["name","Олег","Помилка",'"Олег"'],a:1,f:"print виводить значення змінної, а лапки лише показують, що це рядок, тому їх не видно."},
+{q:"Для чого використовують функції в Python?",o:["Для взаємодії програми з користувачем","Для створення лише списків","Для зберігання лише чисел","Для багаторазового виконання певної дії"],a:3,f:"Принцип DRY: «Don’t Repeat Yourself». Функція пишеться один раз, а викликається скільки завгодно."},
+{q:"Що є параметром функції в такому коді?",c:'def greet(name):\n    print("Привіт", name)',o:["greet","name","Привіт","print"],a:1,f:"Параметр — це змінна в дужках при оголошенні функції. А значення, яке передають при виклику, називають аргументом."},
+{q:'Дано список colors = ["червоний", "зелений", "синій"]. Який елемент списку має значення "зелений"?',o:["colors[0]","colors[1]","colors[3]","colors[2]"],a:1,f:"Нумерація в Python починається з 0, тому перший елемент має індекс 0. Так робить більшість мов програмування."},
+{q:"Що робить команда numbers.append(10), якщо numbers — список?",o:["Додає число 10 до списку","Визначає кількість елементів списку","Сортує список за зростанням","Видаляє число 10 зі списку"],a:0,f:"append означає «приєднати»: елемент додається в кінець списку. Для видалення є remove() і pop()."},
+{q:"Яке значення буде виведено після виконання коду?",c:'x = 3\nx = x + 1\nprint(x)',o:["3","4","7","5"],a:1,f:"Знак = у програмуванні означає не «дорівнює», а «присвоїти»: спочатку обчислюється x + 1, потім результат записується в x."},
+{q:"У програмі потрібно описати учня: його імʼя, клас і щоденні дії. Який підхід найкраще підходить для об’єктно-орієнтованого програмування?",o:["Обʼєднати повʼязані характеристики учня й дії в одну програмну сутність (клас)","Зберігати всі дані тільки в одному рядку","Зберігати характеристики учня як окремі, не повʼязані дані","Зберігати лише імʼя учня"],a:0,f:"Клас — це «креслення», а об’єкти — створені за ним «будинки». З одного класу можна створити хоч 1000 учнів."}
+];
+const N=Q.length,L="АБВГ";
+let i=0,xp=0,st=0,best=0,hints=2,done=0,hist=[],ans=false,H=[],view="game";
+const rnd=a=>a.map(v=>[Math.random(),v]).sort((x,y)=>x[0]-y[0]).map(x=>x[1]);
+Q.forEach(q=>{q.s=rnd(q.o.map((t,k)=>({t,k})))});
+const $=id=>document.getElementById(id),app=$("app");
+const esc=s=>s.replace(/&/g,"&amp;").replace(/</g,"&lt;");
+function hud(){$("xp").textContent=xp;$("st").textContent=st;$("pb").style.width=(done/N*100)+"%"}
+function game(){view="game";hud();
+ if(i>=N||closed)return showRes();
+ const q=Q[i];ans=false;
+ app.innerHTML=`<div class="card"><div style="color:var(--mut);font-size:14px;margin-bottom:6px">Кристал ${i+1} з ${N}</div>
+ <h2>${esc(q.q)}</h2>${q.c?`<pre>${esc(q.c)}</pre>`:""}
+ <div id="os">${q.s.map((o,n)=>`<button class="o" id="o${n}" onclick="pick(${n})"><b>${L[n]}.</b> ${esc(o.t)}</button>`).join("")}</div>
+ <div id="fb"></div>
+ <div class="row"><button class="hint" id="hb" onclick="hint()">🔦 Підказка 50/50 (${hints})</button></div></div>`;
+ if(hints<1)$("hb").disabled=true}
+function hint(){if(ans||hints<1)return;hints--;const q=Q[i];
+ const w=q.s.map((o,n)=>n).filter(n=>q.s[n].k!==q.a);rnd(w).slice(0,2).forEach(n=>{$("o"+n).disabled=true;$("o"+n).classList.add("off")});
+ $("hb").textContent=`🔦 Підказка 50/50 (${hints})`;if(hints<1)$("hb").disabled=true}
+function pick(n){if(ans)return;ans=true;const q=Q[i],ok=q.s[n].k===q.a;
+ q.s.forEach((o,m)=>{const b=$("o"+m);b.disabled=true;if(o.k===q.a)b.classList.add("ok");else if(m===n)b.classList.add("bad")});
+ let g=0;if(ok){st++;best=Math.max(best,st);g=10+(st>1?Math.min(st,5)*2:0);xp+=g}else st=0;
+ done++;hist.push({i,ok});hud();
+ $("fb").innerHTML=`<div style="margin-top:10px;font-weight:700;color:var(--${ok?"ok":"bad"})">${ok?`✅ Правильно! +${g} XP`+(st>2?` 🔥 бонус за серію ×${st}`:""):"❌ Не цього разу, зате тепер ти знаєш відповідь!"}</div>
+ <div class="fact">💡 <b>Цікавинка:</b> ${esc(q.f)}</div>
+ <div class="row"><button class="nx" onclick="i++;game()">${i<N-1?"Далі →":"Фінал 🏁"}</button></div>`}
+function rank(p){return p>=88?["🏆","Python-майстер","Ти готовий(а) до складніших завдань!"]:p>=63?["🚀","Кодер-дослідник","Гарний рівень, повтори теми з помилками."]:p>=38?["🌱","Юний програміст","Непоганий старт! Перечитай теми та спробуй ще раз."]:["🔧","Стажер","Усе попереду: повтори матеріал і грай знову."]}
+function showRes(){view="res";const c=hist.filter(h=>h.ok).length,p=done?Math.round(c/done*100):0,r=rank(p),fin=done>=N;
+ app.innerHTML=`<div class="card"><div class="big">${r[0]}</div><h1 class="ctr">${r[1]}</h1>
+ <p class="ctr" style="color:var(--mut)">${done?r[2]:"Ти ще не відповів(ла) на жодне питання. Час розпочати місію!"}</p>
+ <div class="row" style="justify-content:center"><span class="chip">✅ ${c} / ${done}</span><span class="chip">📈 ${p}%</span><span class="chip">💎 ${xp} XP</span><span class="chip">🔥 рекорд серії ${best}</span></div>
+ <p class="ctr" style="color:var(--mut);font-size:14px">${fin?"Місію завершено!":`Пройдено ${done} із ${N} кристалів`}</p>
+ ${hist.length?`<h2 style="margin-top:16px">Розбір відповідей</h2>`+hist.map(h=>`<div class="rv">${h.ok?"✅":"❌"} <b>${h.i+1}.</b> ${esc(Q[h.i].q)}<br><span style="color:var(--mut)">Правильно: ${esc(Q[h.i].o[Q[h.i].a])}</span></div>`).join(""):""}
+ <div class="fact"><b>🏁 Завершити роботу й отримати код</b><input class="in" id="nm" placeholder="Твоє імʼя та прізвище" oninput="NAME=this.value"><button class="nx" onclick="send()">🏁 Завершити й отримати код</button> <button class="hint hide" id="cp" onclick="navigator.clipboard.writeText($('cd').value).then(()=>$('sm').textContent='📋 Код скопійовано!').catch(()=>$('cd').select())">📋 Скопіювати код</button><p id="sm" style="margin:8px 0 0"></p><textarea id="cd" class="in hide" rows="3" readonly onclick="this.select()"></textarea></div>
+ <div class="row" style="justify-content:center">${fin||closed?"":`<button class="nx" onclick="game()">▶ Продовжити гру</button>`}<button class="hint" onclick="restart()">🔄 Почати знову</button></div></div>`;window.scrollTo(0,0);$("nm").value=NAME;if(closed){$("cd").value=enc(pack());$("cd").classList.remove("hide");$("cp").classList.remove("hide");$("sm").textContent="✅ Роботу завершено! Скопіюй код і передай вчителю."}}
+function restart(){closed=false;i=0;xp=0;st=0;best=0;hints=2;done=0;hist=[];Q.forEach(q=>{q.s=rnd(q.s)});game()}
+function start(){view="start";app.innerHTML=`<div class="card ctr"><div class="big">💎</div><h1>Python Quest</h1><p>Ти — хакер-дослідник. Збери ${N} кристалів коду, відповідаючи на питання з Python. За кожну правильну відповідь отримуєш XP, а серія правильних відповідей дає бонус 🔥. Після кожного питання відкривається цікавинка.</p><p style="color:var(--mut);font-size:14px">Результат можна переглянути будь-коли кнопкою «Мій результат».</p><input class="in" id="nm0" placeholder="Твоє імʼя та прізвище" oninput="NAME=this.value"><button class="nx" onclick="game()">Почати місію 🚀</button></div>`}
+let NAME="",closed=false,U=null,DB=null,MR=[],DR=[],dbNote="";
+(async()=>{try{U=await claude.use("user");if(U&&await U.isOwner())$("tb").classList.remove("hide")}catch(e){}})();
+if(location.hash==="#teacher")setTimeout(teacher,0);
+const pack=()=>({n:NAME.trim()||"Без імені",x:xp,c:hist.filter(h=>h.ok).length,d:done,t:Date.now(),h:hist.map(h=>[h.i,h.ok?1:0])});
+const enc=r=>btoa(unescape(encodeURIComponent(JSON.stringify(r))));
+const dec=s=>{try{const r=JSON.parse(decodeURIComponent(escape(atob(s.trim()))));return r&&r.n&&Array.isArray(r.h)?r:null}catch(e){return null}};
+function send(){if(!NAME.trim()){$("sm").textContent="Спочатку введи своє імʼя";return}
+ closed=true;showRes()}
+function teacher(){const t=$("tp");t.classList.remove("hide");
+ t.innerHTML=`<div class="w"><div class="card"><div class="top"><h2>👩‍🏫 Кабінет вчителя</h2><button class="hint" onclick="$('tp').classList.add('hide')">✖ Закрити</button></div>
+ <p id="tn" style="color:var(--mut);font-size:14px"></p><button class="hint" onclick="loadDb()">🔄 Оновити</button> <button class="hint" onclick="csv()">⬇ Завантажити таблицю (CSV)</button><div id="tl" style="margin-top:10px"></div>
+ <h2 style="margin-top:18px">Додати результат за кодом</h2><textarea id="pc" class="in" rows="3" placeholder="Встав код учня (можна кілька, кожен з нового рядка)"></textarea><button class="nx" onclick="addCode()">➕ Додати</button> <span id="pe" style="color:var(--bad)"></span></div></div>`;loadDb()}
+async function loadDb(){try{if(!DB)throw 0;const s=await DB.collection("results").get();DR=s.docs.map(d=>d.data()).filter(r=>r&&r.n&&Array.isArray(r.h));dbNote=""}
+ catch(e){dbNote="Автоматичні надсилання недоступні: вони видні лише власниці сторінки після входу в акаунт. Додавай результати за кодом нижче."}draw()}
+function addCode(){const ls=$("pc").value.split(/\s+/).filter(Boolean),ok=ls.map(dec).filter(Boolean);$("pe").textContent=ls.length&&ok.length<ls.length?`Некоректних кодів: ${ls.length-ok.length}`:"";ok.forEach(r=>{MR=MR.filter(m=>!(m.n===r.n&&m.t===r.t));MR.push(r)});if(ok.length)$("pc").value="";draw()}
+async function csv(){const a=DR.concat(MR).sort((x,y)=>x.n.localeCompare(y.n,"uk")),q=s=>`"${String(s).replace(/"/g,'""')}"`;
+ const rows=[["Учень","Правильно","Відповів(ла)","Відсоток","XP",...Q.map((_,k)=>"П"+(k+1))].map(q).join(";")].concat(a.map(r=>{const m={};r.h.forEach(([k,o])=>m[k]=o);return [r.n,r.c,r.d,r.d?Math.round(r.c/r.d*100)+"%":"0%",r.x,...Q.map((_,k)=>k in m?m[k]:"")].map(q).join(";")}));
+ try{const d=await claude.use("downloads");if(!d)throw 0;await d.save({filename:"rezultaty-python-quest.csv",data:"\ufeff"+rows.join("\n")})}catch(e){$("pe").textContent="Не вдалося зберегти файл"}}
+function draw(){$("tn").textContent="Вставте коди учнів: результати з’являться в таблиці.";const a=DR.concat(MR).sort((x,y)=>x.n.localeCompare(y.n,"uk"));
+ $("tl").innerHTML=a.length?`<table class="tt"><tr><th>Учень</th><th>Вірно</th><th>%</th><th>XP</th></tr>`+a.map(r=>`<tr><td>${esc(r.n)}</td><td>${r.c}/${r.d}</td><td>${r.d?Math.round(r.c/r.d*100):0}%</td><td>${r.x}</td></tr><tr><td colspan="4"><details><summary>Розбір (${r.d} з ${N}) · ${new Date(r.t).toLocaleString("uk")}</summary>${r.h.map(([k,o])=>Q[k]?`<div class="rv">${o?"✅":"❌"} <b>${k+1}.</b> ${esc(Q[k].q)}${o?"":`<br><span style="color:var(--mut)">Правильно: ${esc(Q[k].o[Q[k].a])}</span>`}</div>`:"").join("")}</details></td></tr>`).join("")+"</table>":"<p>Результатів поки немає.</p>"}
+start();
+</script></body></html>
